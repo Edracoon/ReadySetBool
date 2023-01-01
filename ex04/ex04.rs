@@ -106,6 +106,6 @@ fn print_truth_table(formula: &str) {
 }
 
 fn main() {
-	let formula = "AB&C^";
+	let formula = "AB&C|";
 	print_truth_table(formula);
 }
