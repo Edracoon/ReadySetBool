@@ -98,7 +98,7 @@ fn print_truth_table(formula: &str) {
 		}
 		let mut formula = formula.to_string();	// Copy formula
 		for (i, c) in letters.iter().enumerate() {
-			formula = formula.replace(*c, &s[i..i+1]);
+			formula = formula.replace(*c, &s[i..i+1]); // Replace letters by bits
 		}
 		print!(" {} |", eval_formula(&formula) as i32);
 	}
