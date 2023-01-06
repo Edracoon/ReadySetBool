@@ -1,40 +1,44 @@
-use std::boxed::Box;
+pub mod binary_tree {
 
-/* Binary Tree */
-enum BinaryTree<T> {
-	Node {
-		value: T,
-		left: Box<BinaryTree<T>>,
-		right: Box<BinaryTree<T>>,
-	},
-	Leaf, // Represent an empty node
-}
+	use std::boxed::Box;
 
-impl<T> BinaryTree<T> {
-	fn new(value: T, left: BinaryTree<T>, right: BinaryTree<T>) -> BinaryTree<T> {
-		BinaryTree::Node {
-			value,
-			left: Box::new(left),
-			right: Box::new(right),
+	/* Binary Tree */
+	pub enum BinaryTree {
+		Node {
+			value: String,
+			left: Box<BinaryTree>,
+			right: Box<BinaryTree>,
+		},
+		Leaf, // Represent an empty node
+	}
+
+	impl BinaryTree {
+		pub fn new(value: String, left: BinaryTree, right: BinaryTree) -> BinaryTree {
+			BinaryTree::Node {
+				value,
+				left: Box::new(left),
+				right: Box::new(right),
+			}
 		}
 	}
-}
 
-fn print_binary_tree<T>(tree: &BinaryTree<T>, space: i32) {
-	let	i = 5;
-	match tree {
-		// If it's a node
-		BinaryTree::Node { value, left, right } => {
-			space += 5;
-			println!("{}", value);
-			print_binary_tree(right, space);
-			while i++ < space {
-				print!(" ");
+	pub fn print_binary_tree(tree: &BinaryTree, mut space: i32) {
+		let	mut i = 5;
+		match tree {
+			// If it's a node
+			BinaryTree::Node { value, left, right } => {
+				space += 5;
+				println!("{}", value);
+				print_binary_tree(right, space);
+				while i < space {
+					print!(" ");
+					i += 1;
+				}
+				print!("{}(", value);
+				print_binary_tree(left, space);
 			}
-			print!("{}(", value);
-			print_binary_tree(left, space);
+			// If it's a leaf do nothing
+			BinaryTree::Leaf => (),
 		}
-		// If it's a leaf do nothing
-		BinaryTree::Leaf => (),
 	}
 }

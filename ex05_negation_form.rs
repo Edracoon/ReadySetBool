@@ -1,86 +1,72 @@
+mod	binary_tree;
+use binary_tree::binary_tree::BinaryTree;
+use binary_tree::binary_tree::print_binary_tree;
 
+mod ex03_eval_formula;
+use ex03_eval_formula::ex03_eval_formula::eval_formula;
 
-fn eval_formula(formula: &str) -> bool {
-	let char_vec: Vec<char> = formula.chars().collect();
-	let mut stack: Vec<bool> = Vec::new();
-	for token in char_vec {
+/*
+* Parse Reverse Polish Notation (RPN) using a stack and a binary tree
+*/
+fn parse_rpn(formula: &str) -> BinaryTree::Node {
+	let mut stack: Vec<BinaryTree::Node> = Vec::new();
+	let mut tree: BinaryTree::Node = BinaryTree::Node::new();
+	for token in formula.chars() {
 		match token {
 			'!' => { // NOT	¬x ex: ¬1 = 0, ¬0 = 1
-				let a = stack.pop().unwrap();
-				stack.push(!a);
+				let mut node = BinaryTree::Node::new();
+				node.value = token;
+				node.left = Some(Box::new(stack.pop().unwrap()));
+				stack.push(node);
 			}
 			'&' => { // AND x ∧ y ex: 1 ∧ 1 = 1, 1 ∧ 0 = 0, 0 ∧ 1 = 0, 0 ∧ 0 = 0
-				let a = stack.pop().unwrap();
-				let b = stack.pop().unwrap();
-				stack.push(a & b);
+				let mut node = BinaryTree::Node::new();
+				node.value = token;
+				node.right = Some(Box::new(stack.pop().unwrap()));
+				node.left = Some(Box::new(stack.pop().unwrap()));
+				stack.push(node);
 			}
 			'|' => { // OR x ∨ y ex: 1 ∨ 1 = 1, 1 ∨ 0 = 1, 0 ∨ 1 = 1, 0 ∨ 0 = 0
-				let a = stack.pop().unwrap();
-				let b = stack.pop().unwrap();
-				stack.push(a | b);
+				let mut node = BinaryTree::Node::new();
+				node.value = token;
+				node.right = Some(Box::new(stack.pop().unwrap()));
+				node.left = Some(Box::new(stack.pop().unwrap()));
+				stack.push(node);
 			}
 			'^' => { // XOR x ⊕ y ex: 1 ⊕ 1 = 0, 1 ⊕ 0 = 1, 0 ⊕ 1 = 1, 0 ⊕ 0 = 0
-				let a = stack.pop().unwrap();
-				let b = stack.pop().unwrap();
-				stack.push(a ^ b);
+				let mut node = BinaryTree::Node::new();
+				node.value = token;
+				node.right = Some(Box::new(stack.pop().unwrap()));
+				node.left = Some(Box::new(stack.pop().unwrap()));
+				stack.push(node);
 			}
-			
 			'=' => { // EQUALS x = y ex: 1 = 1 = 1, 1 = 0 = 0, 0 = 1 = 0, 0 = 0 = 1
-				let a = stack.pop().unwrap();
-				let b = stack.pop().unwrap();
-				stack.push(a == b);
+				let mut node = BinaryTree::Node::new();
+				node.value = token;
+				node.right = Some(Box::new(stack.pop().unwrap()));
+				node.left = Some(Box::new(stack.pop().unwrap()));
+				stack.push(node);
 			}
-			'>' => { // IMPLIES or MATERIAL CONDITIONAL x → y ex: 1 → 1 = 1, 1 → 0 = 0, 0 → 1 = 1, 0 → 0 = 1
-				let a = stack.pop().unwrap();
-				let b = stack.pop().unwrap();
-				stack.push(!a | b);
-			}
-			/* If not an operand then it's a bit */
-			_ => {
-				let		n: i32 = token.to_digit(10).unwrap() as i32;
-				let		bit = n == 1;
-				stack.push(bit);
+			_ => { // Letters
+				let mut node = BinaryTree::Node::new();
+				node.value = token;
+				stack.push(node);
 			}
 		}
 	}
-	return stack.pop().unwrap();
-}
-
-fn get_truth_table(formula: &str) -> Vec<i32> {
-	let mut letters: Vec<char> = Vec::new();
-	for c in formula.chars() {
-		if c.is_alphabetic() && !letters.contains(&c) { letters.push(c); }
-	}
-	letters.sort();
-
-	let letters_count = letters.len();
-	let nb_comb = 2_i32.pow(letters_count as u32); // 2^letters_count = number of possible combinations of bits
-
-	let mut results = vec![0; nb_comb as usize]; // Create a vector of 0 with nb_comb elements
-
-	// Process and print truth table
-	for i in 0..nb_comb {
-		let mut s = format!("{:b}", i);	  // Convert i to binary
-		while s.len() < letters_count {   // Add 0 to the left if needed 
-			s = format!("0{}", s);
-		}
-		let mut formula = formula.to_string();	// Copy formula
-		for (i, c) in letters.iter().enumerate() {
-			formula = formula.replace(*c, &s[i..i+1]); // Replace letters by bits
-		}
-		results[i as usize] = eval_formula(&formula) as i32;
-	}
-	return results;
+	tree = stack.pop().unwrap();
+	print_binary_tree(&tree, 4);
+	return tree;
 }
 
 /*
- * Wikipedia: https://en.wikipedia.org/wiki/Negation_normal_form
- * The ! operator is the negation operator, it must only be applied to a single variable.
- * The other two allowed operators are the conjunction (AND,&) and disjunction (OR,|) operators.
- */
+* Wikipedia: https://en.wikipedia.org/wiki/Negation_normal_form
+* The ! operator is the negation operator, it must only be applied to a single variable.
+* The other two allowed operators are the conjunction (AND,&) and disjunction (OR,|) operators.
+*/
 
 // Write a function that takes a formula in RPN as a string and returns its negation normal form.
-fn negation_normal_form(formula: &str) -> String {
+pub fn negation_normal_form(formula: &str) -> String {
 	println!("{:?} {:?}", get_truth_table(formula), get_truth_table("A!B!|"));
 	return "".to_string();
 }
@@ -89,3 +75,4 @@ fn main() {
 	let formula = "AB&!";
 	println!("{} -> {}", formula, negation_normal_form(formula));
 }
+	
