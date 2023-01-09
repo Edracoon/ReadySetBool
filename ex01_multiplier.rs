@@ -1,6 +1,16 @@
+fn adder(mut a: u32, mut b: u32) -> u32 {
 
-mod ex00_adder;
-use crate::ex00_adder::ex00_adder::adder;
+	let mut carry	= 1;
+	let mut sum		= 0;
+
+	while carry != 0 {
+		carry = (a & b) << 1;	// AND and shift left to get the carry (la retenue)
+		sum = a ^ b;			// XOR to get the sum result
+		a = carry;
+		b = sum;
+	}
+	return sum;
+}
 
 fn multiplier(mut a: u32, mut b: u32) -> u32 {
 	let mut result	= 0;
